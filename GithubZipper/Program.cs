@@ -23,8 +23,14 @@ namespace GithubZipper
 
             //    segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
             //}
-            EmptyFolder("ZipStorer");
-            CopyFiles("ExampleFiles", "ZipStorer");
+            Console.Write("Copy from: ");
+            string from = Console.ReadLine(); // ExampleFiles
+            Console.Write("To: ");
+            string to = Console.ReadLine(); // ZipStorer
+            EmptyFolder(to);
+            CopyFiles(from, to);
+            Console.WriteLine("Finished!");
+            Console.ReadKey(true);
         }
 
         private static void EmptyFolder(string path)
@@ -50,6 +56,7 @@ namespace GithubZipper
                     Console.WriteLine(e.Message);
                 }
             }
+            Console.WriteLine("Emptied " + path);
         }
 
         private static void setAttributesNormal(DirectoryInfo dir)
@@ -72,11 +79,11 @@ namespace GithubZipper
             {
                 if (new FileInfo(files[i]).Length > 99000000)
                 {
-                    ZipFile(files[i], pathToo + "/" + files[i].Replace(pathFrom, ""));
+                    ZipFile(files[i], pathToo + files[i].Substring(files[i].LastIndexOf('\\')));
                 }
                 else
                 {
-                    File.Copy(files[i], pathToo + "/" + files[i].Substring(files[i].LastIndexOf('\\')));
+                    File.Copy(files[i], pathToo + files[i].Substring(files[i].LastIndexOf('\\')));
                 }
             }
             string[] directories = Directory.GetDirectories(pathFrom);
@@ -89,6 +96,7 @@ namespace GithubZipper
 
                 CopyFiles(directories[i], pathToo + directories[i].Substring(directories[i].IndexOf('\\')));
             }
+            Console.WriteLine("Copied " + pathFrom);
         }
 
         private static void ZipFile(string pathFrom, string pathToo)
@@ -106,6 +114,7 @@ namespace GithubZipper
             string from = pathToo.Remove(pathToo.LastIndexOf('\\')) + pathFrom.Substring(pathFrom.LastIndexOf('\\'));
             string to = pathToo.Remove(pathToo.LastIndexOf('\\')) + pathFrom.Substring(pathFrom.LastIndexOf('\\'), pathFrom.LastIndexOf('.') - pathFrom.LastIndexOf('\\')) + ".zip";
             File.Move(from, to);
+            Console.WriteLine("Zipped " + from + " into " + segmentsCreated + " segments.");
         }
     }
 }
