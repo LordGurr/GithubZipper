@@ -1,6 +1,8 @@
 ﻿using Ionic.Zip;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 //using System.IO.Compression;
 
@@ -74,8 +76,18 @@ namespace GithubZipper
 
         private static void CopyFiles(string pathFrom, string pathToo)
         {
-            string[] files = Directory.GetFiles(pathFrom);
-            for (int i = 0; i < files.Length; i++)
+            List<string> files = Directory.GetFiles(pathFrom).ToList();
+            for (int i = 0; i < files.Count; i++)
+            {
+                string folder = Path.Combine(pathFrom, files[i]);
+                FileInfo info = new FileInfo(folder);
+                if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                {
+                    files.RemoveAt(i);
+                    // do something with your non-hidden folder here
+                }
+            }
+            for (int i = 0; i < files.Count; i++)
             {
                 if (new FileInfo(files[i]).Length > 99000000)
                 {
@@ -83,18 +95,28 @@ namespace GithubZipper
                 }
                 else
                 {
-                    File.Copy(files[i], pathToo + files[i].Substring(files[i].LastIndexOf('\\')));
+                    File.Copy(files[i], pathToo + files[i].Substring(files[i].LastIndexOf('\\')), true);
                 }
             }
-            string[] directories = Directory.GetDirectories(pathFrom);
-            for (int i = 0; i < directories.Length; i++)
+            List<string> directories = Directory.GetDirectories(pathFrom).ToList();
+            for (int i = 0; i < directories.Count; i++)
+            {
+                string folder = Path.Combine(pathFrom, directories[i]);
+                DirectoryInfo info = new DirectoryInfo(folder);
+                if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                {
+                    directories.RemoveAt(i);
+                    // do something with your non-hidden folder here
+                }
+            }
+            for (int i = 0; i < directories.Count; i++)
             {
                 Directory.CreateDirectory(pathToo + "/" + directories[i].Substring(directories[i].LastIndexOf('\\')));
                 //string fullPath = Path.GetFullPath(pathToo + directories[i].Substring(directories[i].Length - pathFrom.Length));
                 //Environment.CurrentDirectory = pathFrom;
                 //CopyFiles(directories[i].Replace(pathFrom + '\\', ""), fullPath);
 
-                CopyFiles(directories[i], pathToo + directories[i].Substring(directories[i].IndexOf('\\')));
+                CopyFiles(directories[i], pathToo + directories[i].Substring(directories[i].LastIndexOf('\\')));
             }
             Console.WriteLine("Copied " + pathFrom);
         }
