@@ -12,19 +12,6 @@ namespace GithubZipper
     {
         private static void Main(string[] args)
         {
-            //Directory.CreateDirectory("ZipStorer");
-            //System.IO.Compression.ZipFile.CreateFromDirectory("ExampleFiles", "ZipStorer", System.IO.Compression.CompressionLevel.Optimal, false);
-            //int segmentsCreated;
-            //using (ZipFile zip = new ZipFile())
-            //{
-            //    //zip.UseUnicodeAsNecessary = true;  // utf-8
-            //    zip.AddDirectory("ExampleFiles");
-            //    zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
-            //    zip.MaxOutputSegmentSize = 99614720; // 100m segments
-            //    zip.Save("ZipStorer/MyFiles.zip");
-
-            //    segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
-            //}
             Console.Write("Copy from: ");
             string from = Console.ReadLine(); // ExampleFiles
             Console.Write("To: ");
@@ -79,12 +66,11 @@ namespace GithubZipper
             List<string> files = Directory.GetFiles(pathFrom).ToList();
             for (int i = 0; i < files.Count; i++)
             {
-                string folder = Path.Combine(pathFrom, files[i]);
-                FileInfo info = new FileInfo(folder);
+                string file = Path.Combine(pathFrom, files[i]);
+                FileInfo info = new FileInfo(file);
                 if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                 {
                     files.RemoveAt(i);
-                    // do something with your non-hidden folder here
                 }
             }
             for (int i = 0; i < files.Count; i++)
@@ -126,7 +112,6 @@ namespace GithubZipper
             int segmentsCreated;
             using (ZipFile zip = new ZipFile())
             {
-                //zip.UseUnicodeAsNecessary = true;  // utf-8
                 zip.AddFile(pathFrom);
                 zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
                 zip.MaxOutputSegmentSize = 99614720; // 100m segments
@@ -136,7 +121,7 @@ namespace GithubZipper
             string from = pathToo.Remove(pathToo.LastIndexOf('\\')) + pathFrom.Substring(pathFrom.LastIndexOf('\\'));
             string to = pathToo.Remove(pathToo.LastIndexOf('\\')) + pathFrom.Substring(pathFrom.LastIndexOf('\\'), pathFrom.LastIndexOf('.') - pathFrom.LastIndexOf('\\')) + ".zip";
             File.Move(from, to);
-            Console.WriteLine("Zipped " + from + " into " + segmentsCreated + " segments.");
+            Console.WriteLine("Zipped " + from + " into " + segmentsCreated + " volumes.");
         }
     }
 }
